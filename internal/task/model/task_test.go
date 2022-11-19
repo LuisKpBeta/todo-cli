@@ -19,7 +19,6 @@ func TestMain(m *testing.M) {
 
 func TestShouldCreateNewTask(t *testing.T) {
 	newTask, _ := NewTask("nova task", Low)
-	assert.Equal(t, newTask.Id, 1)
 	assert.Equal(t, newTask.Description, "nova task")
 	assert.Equal(t, newTask.Priority, Low)
 	assert.Equal(t, newTask.Status, false)
@@ -32,8 +31,4 @@ func TestShouldReturnErrorOnInvalidDescription(t *testing.T) {
 func TestShouldReturnErrorOnInvalidPriority(t *testing.T) {
 	_, err := NewTask("new task", "more or less")
 	assert.Error(t, err, "status must be low, high or normal")
-}
-func TestShouldReturnErrorOnInvalidId(t *testing.T) {
-	_, err := NewTask("new task", Low)
-	assert.Error(t, err, "invalid Id")
 }
