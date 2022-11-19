@@ -12,8 +12,9 @@ import (
 
 type TaskRepositoryStub struct{}
 
-func (t *TaskRepositoryStub) AddTask(task *task.Task) (int, error) {
-	return 1, nil
+func (t *TaskRepositoryStub) AddTask(task *task.Task) error {
+	task.Id = 1
+	return nil
 }
 
 func makeSut() *AddTaskUseCase {
@@ -40,8 +41,8 @@ func TestReturnErrorOnRepositoryReturnsError(t *testing.T) {
 	monkey.PatchInstanceMethod(
 		reflect.TypeOf(sut.TaskRepository),
 		"AddTask",
-		func(t *TaskRepositoryStub, _ *task.Task) (int, error) {
-			return -1, errors.New("error on insert new task")
+		func(t *TaskRepositoryStub, _ *task.Task) error {
+			return errors.New("error on insert new task")
 		})
 	validAddTask := makeValidTask()
 	newTask, err := sut.Execute(validAddTask)

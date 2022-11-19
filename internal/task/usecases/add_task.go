@@ -23,10 +23,9 @@ func (a *AddTaskUseCase) Execute(newTaskDTO AddTaskDTO) (*task.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskId, err := a.TaskRepository.AddTask(newTask)
+	err = a.TaskRepository.AddTask(newTask)
 	if err != nil {
 		return nil, err
 	}
-	newTask.Id = taskId
 	return newTask, nil
 }
