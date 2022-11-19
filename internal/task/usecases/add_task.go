@@ -1,0 +1,32 @@
+package usecases
+
+import task "todo/internal/task/model"
+
+type AddTaskDTO struct {
+	Description string
+	Priority    task.TaskPriority
+}
+
+type AddTaskUseCase struct {
+	TaskRepository task.TaskRepositoryInterface
+}
+
+func NewAddTaskUseCase(taskRepository task.TaskRepositoryInterface) *AddTaskUseCase {
+	return &AddTaskUseCase{
+		TaskRepository: taskRepository,
+	}
+}
+
+func (a *AddTaskUseCase) Execute(newTaskDTO AddTaskDTO) (*task.Task, error) {
+	var err error
+	newTask, err := task.NewTask(newTaskDTO.Description, newTaskDTO.Priority)
+	if err != nil {
+		return nil, err
+	}
+	taskId, err := a.TaskRepository.AddTask(newTask)
+	if err != nil {
+		return nil, err
+	}
+	newTask.Id = taskId
+	return newTask, nil
+}
