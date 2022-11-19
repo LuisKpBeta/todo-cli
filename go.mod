@@ -2,9 +2,11 @@ module todo
 
 go 1.19
 
+require bou.ke/monkey v1.0.2
+
 require (
-	bou.ke/monkey v1.0.2
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
