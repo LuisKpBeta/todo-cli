@@ -1,4 +1,4 @@
-package task
+package model
 
 import (
 	"os"
@@ -18,7 +18,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestShouldCreateNewTask(t *testing.T) {
-	newTask, _ := NewTask(1, "nova task", Low)
+	newTask, _ := NewTask("nova task", Low)
 	assert.Equal(t, newTask.Id, 1)
 	assert.Equal(t, newTask.Description, "nova task")
 	assert.Equal(t, newTask.Priority, Low)
@@ -26,14 +26,14 @@ func TestShouldCreateNewTask(t *testing.T) {
 	assert.Equal(t, newTask.Created, time.Now())
 }
 func TestShouldReturnErrorOnInvalidDescription(t *testing.T) {
-	_, err := NewTask(1, "", Low)
+	_, err := NewTask("", Low)
 	assert.Error(t, err, "descption must have at least 3 characters")
 }
 func TestShouldReturnErrorOnInvalidPriority(t *testing.T) {
-	_, err := NewTask(1, "new task", "more or less")
+	_, err := NewTask("new task", "more or less")
 	assert.Error(t, err, "status must be low, high or normal")
 }
 func TestShouldReturnErrorOnInvalidId(t *testing.T) {
-	_, err := NewTask(-1, "new task", Low)
+	_, err := NewTask("new task", Low)
 	assert.Error(t, err, "invalid Id")
 }

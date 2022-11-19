@@ -1,4 +1,4 @@
-package task
+package model
 
 import (
 	"errors"
@@ -21,9 +21,8 @@ type Task struct {
 	Created     time.Time
 }
 
-func NewTask(id int, description string, priority TaskPriority) (*Task, error) {
+func NewTask(description string, priority TaskPriority) (*Task, error) {
 	task := &Task{
-		Id:          id,
 		Description: description,
 		Status:      false,
 		Priority:    priority,
@@ -43,9 +42,6 @@ func (t *Task) IsValid() error {
 	isValisPriority := t.IsValidPriority()
 	if isValisPriority != nil {
 		return isValisPriority
-	}
-	if t.Id <= 0 {
-		return errors.New("invalid Id")
 	}
 	return nil
 }
