@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 	task "todo/internal/task/model"
 )
 
@@ -32,6 +33,39 @@ func (t *TaskRepository) AddTask(task *task.Task) error {
 	checkErr(err)
 	task.Id = int(createdId)
 	return nil
+}
+func (t *TaskRepository) CompleteTask(task *task.Task) error {
+	newStatus := 0
+	if task.Status {
+		newStatus = 1
+	}
+	stmt, err := t.Db.Prepare("UPDATE tasks set status=? where id=?")
+	checkErr(err)
+	_, err = stmt.Exec(newStatus, task.Id)
+	return err
+}
+func (t *TaskRepository) FindById(taskId int) (*task.Task, error) {
+	var id int
+	var descption, priority string
+	var status int
+	var created time.Time
+	err := t.Db.QueryRow("SELECT * FROM tasks where id = ?", taskId).
+		Scan(&id, &descption, &status, &priority, &created)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	task := &task.Task{
+		Id:          id,
+		Description: descption,
+		Status:      (status == 1),
+		Priority:    task.TaskPriority(priority),
+		Created:     created,
+	}
+	return task, nil
 }
 
 func checkErr(err error) {
