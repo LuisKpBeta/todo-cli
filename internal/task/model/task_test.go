@@ -32,3 +32,10 @@ func TestShouldReturnErrorOnInvalidPriority(t *testing.T) {
 	_, err := NewTask("new task", "more or less")
 	assert.Error(t, err, "status must be low, high or normal")
 }
+
+func TestShouldMarkTaskStatusAsTrue(t *testing.T) {
+	newTask, _ := NewTask("nova task", Low)
+	assert.Equal(t, newTask.Status, false)
+	newTask.CompleteTask()
+	assert.Equal(t, newTask.Status, true)
+}

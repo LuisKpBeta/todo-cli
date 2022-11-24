@@ -52,3 +52,6 @@ func (t *Task) IsValidPriority() error {
 	}
 	return errors.New("status must be low, high or normal")
 }
+func (t *Task) CompleteTask() {
+	t.Status = true
+}
