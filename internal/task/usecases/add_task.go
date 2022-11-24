@@ -8,10 +8,10 @@ type AddTaskDTO struct {
 }
 
 type AddTaskUseCase struct {
-	TaskRepository task.TaskRepositoryInterface
+	TaskRepository task.AddTaskRepositoryInterface
 }
 
-func NewAddTaskUseCase(taskRepository task.TaskRepositoryInterface) *AddTaskUseCase {
+func NewAddTaskUseCase(taskRepository task.AddTaskRepositoryInterface) *AddTaskUseCase {
 	return &AddTaskUseCase{
 		TaskRepository: taskRepository,
 	}
