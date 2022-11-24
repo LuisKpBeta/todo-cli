@@ -9,3 +9,6 @@ type CompleteTaskRepositoryInterface interface {
 type FindTaskRepositoryInterface interface {
 	FindById(taskId int) (*Task, error)
 }
+type DeleteTaskRepositoryInterface interface {
+	DeleteById(taskId int) error
+}

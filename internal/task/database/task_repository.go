@@ -68,6 +68,16 @@ func (t *TaskRepository) FindById(taskId int) (*task.Task, error) {
 	return task, nil
 }
 
+func (t *TaskRepository) DeleteById(taskId int) error {
+	stmt, err := t.Db.Prepare("DELETE FROM tasks where id=?")
+	checkErr(err)
+	_, err = stmt.Exec(taskId)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	return err
+}
+
 func checkErr(err error) {
 	if err != nil {
 		panic(err.Error())

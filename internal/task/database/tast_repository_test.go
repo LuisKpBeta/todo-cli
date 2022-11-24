@@ -101,3 +101,17 @@ func (suite *TaskRepositoryTestSuite) TestCompleteTaskRepository() {
 	suite.Equal(newTask.Id, id)
 	suite.Equal(newTask.Status, (status == 1))
 }
+func (suite *TaskRepositoryTestSuite) TestDeleteTaskRepository() {
+	newTask, err := task.NewTask("nova task", task.Low)
+	suite.NoError(err)
+	suite.insertDummyTask(newTask)
+	repo := NewTaskRepository(suite.Db)
+	err = repo.DeleteById(newTask.Id)
+	suite.Nil(err)
+
+	var id int
+	suite.Db.QueryRow("Select id from tasks where id = ?", newTask.Id).
+		Scan(&id)
+
+	suite.Zero(id)
+}
