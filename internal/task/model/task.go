@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-type TaskPriority string
+type TaskPriority int
 
 const (
-	Low    TaskPriority = "low"
-	Normal TaskPriority = "normal"
-	High   TaskPriority = "high"
+	Low    TaskPriority = 2
+	Normal TaskPriority = 1
+	High   TaskPriority = 0
 )
 
 type Task struct {
