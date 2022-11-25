@@ -31,13 +31,19 @@ func (suite *TaskRepositoryTestSuite) TearDownSuite() {
 	suite.Db.Close()
 }
 func (suite *TaskRepositoryTestSuite) insertDummyTask(task *task.Task) {
+	status := 0
+	if task.Status {
+		status = 1
+	}
 	stmt, _ := suite.Db.Prepare("INSERT INTO tasks (description, status, priority, created) values(?,?,?,?)")
-	res, _ := stmt.Exec(task.Description, 0, task.Priority, task.Created)
+	res, _ := stmt.Exec(task.Description, status, task.Priority, task.Created)
 	id, _ := res.LastInsertId()
 	task.Id = int(id)
 }
-func (suite *TaskRepositoryTestSuite) TearDownTest(suiteName, testName string) {
-	suite.Db.Query("DELETE FROM tasks;")
+func (suite *TaskRepositoryTestSuite) SetupTest() {
+	stmt, err := suite.Db.Prepare("DELETE FROM tasks")
+	checkErr(err)
+	stmt.Exec()
 }
 
 func TestSuite(t *testing.T) {
@@ -101,7 +107,7 @@ func (suite *TaskRepositoryTestSuite) TestCompleteTaskRepository() {
 	suite.Equal(newTask.Id, id)
 	suite.Equal(newTask.Status, (status == 1))
 }
-func (suite *TaskRepositoryTestSuite) TestDeleteTaskRepository() {
+func (suite *TaskRepositoryTestSuite) TestDeleteTaskRepositoryGetAllTasks() {
 	newTask, err := task.NewTask("nova task", task.Low)
 	suite.NoError(err)
 	suite.insertDummyTask(newTask)
@@ -114,4 +120,67 @@ func (suite *TaskRepositoryTestSuite) TestDeleteTaskRepository() {
 		Scan(&id)
 
 	suite.Zero(id)
+}
+func (suite *TaskRepositoryTestSuite) TestListTaskRepository() {
+	task1, _ := task.NewTask("nova 1", task.Low)
+	completedTask, _ := task.NewTask("task 2", task.Normal)
+	completedTask.Status = true
+	suite.insertDummyTask(task1)
+	suite.insertDummyTask(completedTask)
+	repo := NewTaskRepository(suite.Db)
+	taskList, err := repo.ListTasks(true, false)
+	suite.Nil(err)
+
+	suite.Equal(len(taskList), 2)
+	suite.Equal(taskList[0].Id, task1.Id)
+	suite.Equal(taskList[1].Id, completedTask.Id)
+}
+func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryGetOnlyPendingTasks() {
+	task1, _ := task.NewTask("task 1", task.Low)
+	completedTask, _ := task.NewTask("task 2", task.Normal)
+	completedTask.Status = true
+	suite.insertDummyTask(task1)
+	suite.insertDummyTask(completedTask)
+	repo := NewTaskRepository(suite.Db)
+	taskList, err := repo.ListTasks(false, false)
+	suite.Nil(err)
+	for _, task:=range taskList {
+		suite.False(task.Status)
+	}
+}
+func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryOrderingByPriority() {
+	completed, _ := task.NewTask("task 0", task.Low)
+	lowTask, _ := task.NewTask("task 1", task.Low)
+	normalTask, _ := task.NewTask("task 2", task.Normal)
+	highTask, _ := task.NewTask("task 2", task.High)
+	completed.Status=true
+	suite.insertDummyTask(completed)
+	suite.insertDummyTask(lowTask)
+	suite.insertDummyTask(normalTask)
+	suite.insertDummyTask(highTask)
+	repo := NewTaskRepository(suite.Db)
+	taskList, err := repo.ListTasks(false, true)
+	suite.Nil(err)
+	suite.Equal(len(taskList), 3)
+	suite.Equal(taskList[0].Id, highTask.Id)
+	suite.Equal(taskList[1].Id, normalTask.Id)
+	suite.Equal(taskList[2].Id, lowTask.Id)
+}
+func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryOrderingByPriorityGettingAllTasks() {
+	completed, _ := task.NewTask("task 0", task.Low)
+	lowTask, _ := task.NewTask("task 1", task.Low)
+	normalTask, _ := task.NewTask("task 2", task.Normal)
+	highTask, _ := task.NewTask("task 2", task.High)
+	suite.insertDummyTask(completed)
+	suite.insertDummyTask(lowTask)
+	suite.insertDummyTask(normalTask)
+	suite.insertDummyTask(highTask)
+	repo := NewTaskRepository(suite.Db)
+	taskList, err := repo.ListTasks(true, true)
+	suite.Nil(err)
+	suite.Equal(len(taskList), 4)
+	suite.Equal(taskList[0].Id, highTask.Id)
+	suite.Equal(taskList[1].Id, normalTask.Id)
+	suite.Equal(taskList[2].Id, completed.Id)
+	suite.Equal(taskList[3].Id, lowTask.Id)
 }

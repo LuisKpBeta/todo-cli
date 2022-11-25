@@ -12,3 +12,6 @@ type FindTaskRepositoryInterface interface {
 type DeleteTaskRepositoryInterface interface {
 	DeleteById(taskId int) error
 }
+type ListTaskRepositoryInterface interface {
+	ListTasks(listAll bool, orderByPriority bool) ([]Task, error)
+}
