@@ -19,14 +19,7 @@ type ListTaskRepositoryStub struct {
 	}
 }
 
-func (t *ListTaskRepositoryStub) ListTasks(listAll bool, orderByPriority bool) ([]task.Task, error) {
-	t.CalledArgs = struct {
-		listAll         bool
-		orderByPriority bool
-	}{
-		listAll:         listAll,
-		orderByPriority: orderByPriority,
-	}
+func makeTaskList() []task.Task {
 	var taskList []task.Task
 	validAddTask := task.Task{
 		Id:          1,
@@ -36,6 +29,17 @@ func (t *ListTaskRepositoryStub) ListTasks(listAll bool, orderByPriority bool) (
 	}
 	validAddTask.SetPriority(task.High)
 	taskList = append(taskList, validAddTask)
+	return taskList
+}
+func (t *ListTaskRepositoryStub) ListTasks(listAll bool, orderByPriority bool) ([]task.Task, error) {
+	t.CalledArgs = struct {
+		listAll         bool
+		orderByPriority bool
+	}{
+		listAll:         listAll,
+		orderByPriority: orderByPriority,
+	}
+	taskList := makeTaskList()
 	return taskList, nil
 }
 
@@ -65,7 +69,7 @@ func TestListTaskUseCase(t *testing.T) {
 	assert.Equal(t, tasks[0].Description, "new task")
 }
 func TestListTaskUseCaseCallsRepositoryWithCorrectArgs(t *testing.T) {
-	
+
 	sut, repoSpy := makeListTaskUseCase()
 	_, err := sut.Execute(ListTaskArgs{ListAll: false, OrderByPriority: true})
 	assert.Nil(t, err)
@@ -84,4 +88,16 @@ func TestListTaskUseCaseReturnsListOfReadTaskDTO(t *testing.T) {
 	assert.Equal(t, tasks[0].Id, 1)
 	assert.Equal(t, tasks[0].Age, "1 hour 25 minutes")
 	assert.Equal(t, tasks[0].Priority, "high")
+}
+func TestListTaskUseCaseMapTasksToReadTaskDTO(t *testing.T) {
+	monkey.Patch(time.Now, func() time.Time {
+		return time.Date(2022, 11, 19, 13, 25, 0, 0, time.Local)
+	})
+	taskList := makeTaskList()
+	sut, _ := makeListTaskUseCase()
+	readTasks := sut.mapTaskToReadTaskDTO(taskList)
+
+	assert.Equal(t, len(readTasks), len(taskList))
+	assert.Equal(t, readTasks[0].Age, taskList[0].Age())
+	assert.Equal(t, readTasks[0].Priority, taskList[0].PriorityToString())
 }

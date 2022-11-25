@@ -29,8 +29,12 @@ func (l *ListTaskUseCase) Execute(listTaskArgs ListTaskArgs) ([]ReadTaskDTO, err
 	if err != nil {
 		return nil, err
 	}
+	readTasks:=l.mapTaskToReadTaskDTO(tasks)
+	return readTasks, nil
+}
+func (l *ListTaskUseCase) mapTaskToReadTaskDTO(taskList []task.Task) []ReadTaskDTO {
 	var readTasks []ReadTaskDTO
-	for _, task := range tasks {
+	for _, task := range taskList {
 		readTask := ReadTaskDTO{
 			Id:          task.Id,
 			Description: task.Description,
@@ -40,5 +44,5 @@ func (l *ListTaskUseCase) Execute(listTaskArgs ListTaskArgs) ([]ReadTaskDTO, err
 		}
 		readTasks = append(readTasks, readTask)
 	}
-	return readTasks, nil
+	return readTasks
 }
