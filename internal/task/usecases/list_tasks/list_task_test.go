@@ -32,9 +32,9 @@ func (t *ListTaskRepositoryStub) ListTasks(listAll bool, orderByPriority bool) (
 		Id:          1,
 		Description: "new task",
 		Status:      false,
-		Priority:    task.High,
 		Created:     time.Date(2022, 11, 19, 12, 0, 0, 0, time.Local),
 	}
+	validAddTask.SetPriority(task.High)
 	taskList = append(taskList, validAddTask)
 	return taskList, nil
 }

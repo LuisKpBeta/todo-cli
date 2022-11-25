@@ -36,7 +36,7 @@ func (suite *TaskRepositoryTestSuite) insertDummyTask(task *task.Task) {
 		status = 1
 	}
 	stmt, _ := suite.Db.Prepare("INSERT INTO tasks (description, status, priority, created) values(?,?,?,?)")
-	res, _ := stmt.Exec(task.Description, status, task.Priority, task.Created)
+	res, _ := stmt.Exec(task.Description, status, task.Priority(), task.Created)
 	id, _ := res.LastInsertId()
 	task.Id = int(id)
 }

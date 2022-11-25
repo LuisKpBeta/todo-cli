@@ -25,7 +25,7 @@ func (t *TaskRepository) AddTask(task *task.Task) error {
 	if task.Status {
 		status = 1
 	}
-	result, err := stmt.Exec(task.Description, status, task.Priority, task.Created)
+	result, err := stmt.Exec(task.Description, status, task.Priority(), task.Created)
 	if err != nil {
 		return err
 	}
@@ -58,14 +58,14 @@ func (t *TaskRepository) FindById(taskId int) (*task.Task, error) {
 		}
 		return nil, err
 	}
-	task := &task.Task{
+	tsk := &task.Task{
 		Id:          id,
 		Description: descption,
 		Status:      (status == 1),
-		Priority:    task.TaskPriority(priority),
 		Created:     created,
 	}
-	return task, nil
+	tsk.SetPriority(task.TaskPriority(priority))
+	return tsk, nil
 }
 func (t *TaskRepository) DeleteById(taskId int) error {
 	stmt, err := t.Db.Prepare("DELETE FROM tasks where id=?")
@@ -102,7 +102,7 @@ func (t *TaskRepository) ListTasks(listAll bool, orderByPriority bool) ([]task.T
 			return nil, err
 		}
 		tsk.Status = status == 1
-		tsk.Priority = task.TaskPriority(priority)
+		tsk.SetPriority(task.TaskPriority(priority))
 		taskList = append(taskList, tsk)
 	}
 

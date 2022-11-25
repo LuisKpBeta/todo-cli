@@ -34,7 +34,7 @@ func TestAddTaskCreateAndReturnNewTask(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, newTask.Id, 1)
 	assert.Equal(t, newTask.Description, newTask.Description)
-	assert.Equal(t, newTask.Priority, newTask.Priority)
+	assert.Equal(t, newTask.Priority(), newTask.Priority())
 }
 func TestReturnErrorOnRepositoryReturnsError(t *testing.T) {
 	sut := makeSut()

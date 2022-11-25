@@ -20,7 +20,7 @@ func TestMain(m *testing.M) {
 func TestShouldCreateNewTask(t *testing.T) {
 	newTask, _ := NewTask("nova task", Low)
 	assert.Equal(t, newTask.Description, "nova task")
-	assert.Equal(t, newTask.Priority, Low)
+	assert.Equal(t, newTask.priority, Low)
 	assert.Equal(t, newTask.Status, false)
 	assert.Equal(t, newTask.Created, time.Now())
 }
@@ -54,10 +54,10 @@ func TestReturnPriorityInStringFormat(t *testing.T) {
 	newTask, _ := NewTask("nova task", Low)
 	priority := newTask.PriorityToString()
 	assert.Equal(t, priority, "low")
-	newTask.Priority = Normal
+	newTask.SetPriority(Normal)
 	priority = newTask.PriorityToString()
 	assert.Equal(t, priority, "normal")
-	newTask.Priority = High
+	newTask.SetPriority(High)
 	priority = newTask.PriorityToString()
 	assert.Equal(t, priority, "high")
 }

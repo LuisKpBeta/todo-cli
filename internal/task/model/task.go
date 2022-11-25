@@ -19,7 +19,7 @@ type Task struct {
 	Id          int
 	Description string
 	Status      bool
-	Priority    TaskPriority
+	priority    TaskPriority
 	Created     time.Time
 }
 
@@ -27,7 +27,7 @@ func NewTask(description string, priority TaskPriority) (*Task, error) {
 	task := &Task{
 		Description: description,
 		Status:      false,
-		Priority:    priority,
+		priority:    priority,
 		Created:     time.Now(),
 	}
 	isValid := task.IsValid()
@@ -48,11 +48,7 @@ func (t *Task) IsValid() error {
 	return nil
 }
 func (t *Task) IsValidPriority() error {
-	switch t.Priority {
-	case Low, Normal, High:
-		return nil
-	}
-	return errors.New("status must be low, high or normal")
+	return checkPriorityValue(t.priority)
 }
 func (t *Task) CompleteTask() {
 	t.Status = true
@@ -88,7 +84,7 @@ func (t *Task) Age() string {
 	return strings.TrimSpace(age_string)
 }
 func (t *Task) PriorityToString() string {
-	switch t.Priority {
+	switch t.priority {
 	case Low:
 		return "low"
 	case Normal:
@@ -98,5 +94,22 @@ func (t *Task) PriorityToString() string {
 	default:
 		return ""
 	}
-	
+}
+func (t *Task) Priority() TaskPriority {
+	return t.priority
+}
+func (t *Task) SetPriority(priority TaskPriority) error {
+	err:=checkPriorityValue(priority)
+	if(err!=nil){
+		return err
+	}
+	t.priority = priority
+	return nil
+}
+func checkPriorityValue(priority TaskPriority) error {
+	switch priority {
+	case Low, Normal, High:
+		return nil
+	}
+	return errors.New("status must be low, high or normal")
 }
