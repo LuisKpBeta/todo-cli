@@ -33,7 +33,7 @@ func (t *ListTaskRepositoryStub) ListTasks(listAll bool, orderByPriority bool) (
 		Description: "new task",
 		Status:      false,
 		Priority:    task.High,
-		Created:     time.Now(),
+		Created:     time.Date(2022, 11, 19, 12, 0, 0, 0, time.Local),
 	}
 	taskList = append(taskList, validAddTask)
 	return taskList, nil
@@ -65,10 +65,23 @@ func TestListTaskUseCase(t *testing.T) {
 	assert.Equal(t, tasks[0].Description, "new task")
 }
 func TestListTaskUseCaseCallsRepositoryWithCorrectArgs(t *testing.T) {
+	
 	sut, repoSpy := makeListTaskUseCase()
 	_, err := sut.Execute(ListTaskArgs{ListAll: false, OrderByPriority: true})
 	assert.Nil(t, err)
 	assert.True(t, repoSpy.CalledArgs.orderByPriority)
 	assert.False(t, repoSpy.CalledArgs.listAll)
+}
 
+func TestListTaskUseCaseReturnsListOfReadTaskDTO(t *testing.T) {
+	monkey.Patch(time.Now, func() time.Time {
+		return time.Date(2022, 11, 19, 13, 25, 0, 0, time.Local)
+	})
+	sut, _ := makeListTaskUseCase()
+	tasks, err := sut.Execute(ListTaskArgs{})
+	assert.Nil(t, err)
+	assert.Equal(t, len(tasks), 1)
+	assert.Equal(t, tasks[0].Id, 1)
+	assert.Equal(t, tasks[0].Age, "1 hour 25 minutes")
+	assert.Equal(t, tasks[0].Priority, "high")
 }

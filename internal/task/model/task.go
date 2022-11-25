@@ -2,6 +2,8 @@ package model
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -54,4 +56,47 @@ func (t *Task) IsValidPriority() error {
 }
 func (t *Task) CompleteTask() {
 	t.Status = true
+}
+func (t *Task) Age() string {
+	format := func(txt string, value int) string {
+		if value > 1 {
+			return fmt.Sprint(txt, "s")
+		}
+		return txt
+	}
+	now := time.Now()
+	created := t.Created
+	days := int(now.Sub(created).Abs().Hours() / 24)
+	var age_string string
+	if days >= 1 {
+		d_text := format("day", days)
+		created = created.AddDate(0, 0, days)
+		age_string = fmt.Sprint(days, " ", d_text)
+	}
+	age := now.Sub(created)
+
+	if age.Minutes() != 0 {
+		hours := int(age.Minutes() / 60)
+		minutes := int(age.Minutes()) % 60
+		if hours > 0 {
+			h_text := format("hour", hours)
+			age_string = fmt.Sprint(age_string, " ", hours, " ", h_text)
+		}
+		m_text := format("minute", minutes)
+		age_string = fmt.Sprint(age_string, " ", minutes, " ", m_text)
+	}
+	return strings.TrimSpace(age_string)
+}
+func (t *Task) PriorityToString() string {
+	switch t.Priority {
+	case Low:
+		return "low"
+	case Normal:
+		return "normal"
+	case High:
+		return "high"
+	default:
+		return ""
+	}
+	
 }

@@ -43,10 +43,21 @@ func TestShouldMarkTaskStatusAsTrue(t *testing.T) {
 func TestReturnFormatedAgeOfTask(t *testing.T) {
 	newTask, _ := NewTask("nova task", Low)
 	newTask.Created = time.Date(2022, 11, 10, 12, 0, 0, 0, time.Local)
-	age:=newTask.Age()
+	age := newTask.Age()
 	assert.Equal(t, age, "9 days")
 	newTask.Created = time.Date(2022, 11, 18, 21, 30, 0, 0, time.Local)
-	age=newTask.Age()
+	age = newTask.Age()
 	assert.Equal(t, age, "14 hours 30 minutes")
 
+}
+func TestReturnPriorityInStringFormat(t *testing.T) {
+	newTask, _ := NewTask("nova task", Low)
+	priority := newTask.PriorityToString()
+	assert.Equal(t, priority, "low")
+	newTask.Priority = Normal
+	priority = newTask.PriorityToString()
+	assert.Equal(t, priority, "normal")
+	newTask.Priority = High
+	priority = newTask.PriorityToString()
+	assert.Equal(t, priority, "high")
 }
