@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 	task "todo/internal/task/model"
+	dto "todo/internal/task/usecases/task_dto"
 
 	"bou.ke/monkey"
 	"github.com/stretchr/testify/assert"
@@ -20,8 +21,8 @@ func (t *TaskRepositoryStub) AddTask(task *task.Task) error {
 func makeSut() *AddTaskUseCase {
 	return NewAddTaskUseCase(&TaskRepositoryStub{})
 }
-func makeValidTask() AddTaskDTO {
-	addTaskDTO := AddTaskDTO{
+func makeValidTask() dto.AddTaskDTO {
+	addTaskDTO := dto.AddTaskDTO{
 		Description: "new task",
 		Priority:    task.Normal,
 	}

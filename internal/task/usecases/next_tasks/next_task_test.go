@@ -70,15 +70,4 @@ func TestListNextTaskUseCaseReturnsListOfReadTaskDTO(t *testing.T) {
 	assert.Equal(t, tasks[0].Age, "1 hour 25 minutes")
 	assert.Equal(t, tasks[0].Priority, "high")
 }
-func TestListTasNextkUseCaseMapTasksToReadTaskDTO(t *testing.T) {
-	monkey.Patch(time.Now, func() time.Time {
-		return time.Date(2022, 11, 19, 13, 25, 0, 0, time.Local)
-	})
-	taskList := makeTaskList()
-	sut := makeListNextTaskUseCase()
-	readTasks := sut.mapTaskToReadTaskDTO(taskList)
 
-	assert.Equal(t, len(readTasks), len(taskList))
-	assert.Equal(t, readTasks[0].Age, taskList[0].Age())
-	assert.Equal(t, readTasks[0].Priority, taskList[0].PriorityToString())
-}

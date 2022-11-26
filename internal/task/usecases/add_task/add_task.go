@@ -1,11 +1,11 @@
 package usecases
 
-import task "todo/internal/task/model"
+import (
+	task "todo/internal/task/model"
+	dto "todo/internal/task/usecases/task_dto"
+)
 
-type AddTaskDTO struct {
-	Description string
-	Priority    task.TaskPriority
-}
+
 
 type AddTaskUseCase struct {
 	TaskRepository task.AddTaskRepositoryInterface
@@ -17,7 +17,7 @@ func NewAddTaskUseCase(taskRepository task.AddTaskRepositoryInterface) *AddTaskU
 	}
 }
 
-func (a *AddTaskUseCase) Execute(newTaskDTO AddTaskDTO) (*task.Task, error) {
+func (a *AddTaskUseCase) Execute(newTaskDTO dto.AddTaskDTO) (*task.Task, error) {
 	var err error
 	newTask, err := task.NewTask(newTaskDTO.Description, newTaskDTO.Priority)
 	if err != nil {

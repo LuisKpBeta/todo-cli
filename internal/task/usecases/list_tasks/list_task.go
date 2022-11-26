@@ -1,15 +1,9 @@
 package usecases
 
-import task "todo/internal/task/model"
-
-
-type ReadTaskDTO struct {
-	Id          int
-	Description string
-	Status      bool
-	Priority    string
-	Age         string
-}
+import (
+	task "todo/internal/task/model"
+	dto "todo/internal/task/usecases/task_dto"
+)
 
 type ListTaskUseCase struct {
 	TaskRepository task.ListTaskRepositoryInterface
@@ -21,25 +15,11 @@ func NewListTaskUseCase(taskRepository task.ListTaskRepositoryInterface) *ListTa
 	}
 }
 
-func (l *ListTaskUseCase) Execute(listAll bool) ([]ReadTaskDTO, error) {
+func (l *ListTaskUseCase) Execute(listAll bool) ([]dto.ReadTaskDTO, error) {
 	tasks, err := l.TaskRepository.ListTasks(listAll)
 	if err != nil {
 		return nil, err
 	}
-	readTasks:=l.mapTaskToReadTaskDTO(tasks)
+	readTasks := dto.MapTaskToReadTaskDTO(tasks)
 	return readTasks, nil
-}
-func (l *ListTaskUseCase) mapTaskToReadTaskDTO(taskList []task.Task) []ReadTaskDTO {
-	var readTasks []ReadTaskDTO
-	for _, task := range taskList {
-		readTask := ReadTaskDTO{
-			Id:          task.Id,
-			Description: task.Description,
-			Status:      task.Status,
-			Priority:    task.PriorityToString(),
-			Age:         task.Age(),
-		}
-		readTasks = append(readTasks, readTask)
-	}
-	return readTasks
 }
