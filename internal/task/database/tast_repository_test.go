@@ -16,6 +16,14 @@ type TaskRepositoryTestSuite struct {
 	suite.Suite
 	Db *sql.DB
 }
+func mockTime() {
+	monkey.Patch(time.Now, func() time.Time {
+		return time.Date(2022, 11, 19, 12, 59, 59, 0, time.UTC)
+	})
+}
+func unMockTime(){
+	monkey.Unpatch(time.Now)
+}
 
 func (suite *TaskRepositoryTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", ":memory:")
@@ -23,9 +31,7 @@ func (suite *TaskRepositoryTestSuite) SetupSuite() {
 	repo := NewTaskRepository(db)
 	repo.CreateTaskTableIfNoExists()
 	suite.Db = db
-	monkey.Patch(time.Now, func() time.Time {
-		return time.Date(2022, 11, 19, 12, 59, 59, 0, time.UTC)
-	})
+	mockTime()
 }
 func (suite *TaskRepositoryTestSuite) TearDownSuite() {
 	suite.Db.Close()
@@ -149,6 +155,7 @@ func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryGetOnlyPendingTasks(
 	}
 }
 func (suite *TaskRepositoryTestSuite) TestListNextTaskRepository() {
+	unMockTime()
 	monkey.Unpatch(time.Now)
 	createTask := func(desc string, priority task.TaskPriority, created time.Time, status bool) *task.Task {
 		tsk, _ := task.NewTask(desc, priority)
@@ -176,4 +183,5 @@ func (suite *TaskRepositoryTestSuite) TestListNextTaskRepository() {
 	suite.Equal(taskList[1].Priority(), task.Normal)
 	suite.Equal(taskList[2].Description, "low 1")
 	suite.Equal(taskList[2].Priority(), task.Low)
+	mockTime()
 }
