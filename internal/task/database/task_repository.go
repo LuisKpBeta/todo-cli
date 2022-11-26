@@ -105,6 +105,32 @@ func (t *TaskRepository) ListTasks(listAll bool) ([]task.Task, error) {
 
 	return taskList, nil
 }
+func (t *TaskRepository) ListNextTasks() ([]task.Task, error) {
+	query := "SELECT * FROM tasks WHERE status=0 GROUP BY priority ORDER BY priority, created DESC"
+	rows, err := t.Db.Query(query)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+	var taskList []task.Task
+	for rows.Next() {
+		tsk := task.Task{}
+		var status, priority int
+		err := rows.Scan(&tsk.Id, &tsk.Description, &status, &priority, &tsk.Created)
+		if err != nil {
+			return nil, err
+		}
+		tsk.Status = status == 1
+		tsk.SetPriority(task.TaskPriority(priority))
+		taskList = append(taskList, tsk)
+	}
+
+	return taskList, nil
+}
 func checkErr(err error) {
 	if err != nil {
 		panic(err.Error())

@@ -15,3 +15,6 @@ type DeleteTaskRepositoryInterface interface {
 type ListTaskRepositoryInterface interface {
 	ListTasks(listAll bool) ([]Task, error)
 }
+type ListNextTasksRepositoryInterface interface {
+	ListNextTasks() ([]Task, error)
+}

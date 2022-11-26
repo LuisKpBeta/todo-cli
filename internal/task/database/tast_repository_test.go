@@ -107,7 +107,7 @@ func (suite *TaskRepositoryTestSuite) TestCompleteTaskRepository() {
 	suite.Equal(newTask.Id, id)
 	suite.Equal(newTask.Status, (status == 1))
 }
-func (suite *TaskRepositoryTestSuite) TestDeleteTaskRepositoryGetAllTasks() {
+func (suite *TaskRepositoryTestSuite) TestDeleteTaskRepositoryDeleteTaskById() {
 	newTask, err := task.NewTask("nova task", task.Low)
 	suite.NoError(err)
 	suite.insertDummyTask(newTask)
@@ -144,7 +144,36 @@ func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryGetOnlyPendingTasks(
 	repo := NewTaskRepository(suite.Db)
 	taskList, err := repo.ListTasks(false)
 	suite.Nil(err)
-	for _, task:=range taskList {
+	for _, task := range taskList {
 		suite.False(task.Status)
 	}
+}
+func (suite *TaskRepositoryTestSuite) TestListNextTaskRepository() {
+	monkey.Unpatch(time.Now)
+	createTask := func(desc string, priority task.TaskPriority, created time.Time, status bool) *task.Task {
+		tsk, _ := task.NewTask(desc, priority)
+		tsk.Created = created
+		tsk.Status = status
+		suite.insertDummyTask(tsk)
+		return tsk
+	}
+	oldTime := time.Date(2022, 11, 19, 12, 0, 0, 0, time.UTC)
+	newTime := time.Date(2022, 11, 20, 12, 0, 0, 0, time.UTC)
+	createTask("normal 1", task.Normal, oldTime, false)
+	createTask("high 1", task.High, oldTime, true)
+	createTask("low 1", task.Low, oldTime, false)
+	createTask("normal 2", task.Normal, newTime, false)
+	createTask("low 2", task.Low, newTime, false)
+	createTask("high 2", task.High, newTime, false)
+
+	repo := NewTaskRepository(suite.Db)
+	taskList, err := repo.ListNextTasks()
+	suite.Nil(err)
+	suite.Equal(len(taskList), 3)
+	suite.Equal(taskList[0].Description, "high 2")
+	suite.Equal(taskList[0].Priority(), task.High)
+	suite.Equal(taskList[1].Description, "normal 1")
+	suite.Equal(taskList[1].Priority(), task.Normal)
+	suite.Equal(taskList[2].Description, "low 1")
+	suite.Equal(taskList[2].Priority(), task.Low)
 }
