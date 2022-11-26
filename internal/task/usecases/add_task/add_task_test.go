@@ -24,7 +24,7 @@ func makeSut() *AddTaskUseCase {
 func makeValidTask() dto.AddTaskDTO {
 	addTaskDTO := dto.AddTaskDTO{
 		Description: "new task",
-		Priority:    task.Normal,
+		Priority:    "normal",
 	}
 	return addTaskDTO
 }

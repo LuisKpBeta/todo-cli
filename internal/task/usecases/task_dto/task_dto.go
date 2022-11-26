@@ -1,10 +1,14 @@
 package task_dto
 
-import task "todo/internal/task/model"
+import (
+	"errors"
+	"strings"
+	task "todo/internal/task/model"
+)
 
 type AddTaskDTO struct {
 	Description string
-	Priority    task.TaskPriority
+	Priority    string
 }
 
 type ReadTaskDTO struct {
@@ -27,4 +31,19 @@ func MapTaskToReadTaskDTO(taskList []task.Task) []ReadTaskDTO {
 		readTasks = append(readTasks, readTask)
 	}
 	return readTasks
+}
+
+func MapAddTaskDtoToTask(addTask AddTaskDTO) (string, task.TaskPriority, error){
+	var priority int
+	switch strings.ToLower(addTask.Priority){
+	case "low":
+		priority = 2
+	case "normal":
+		priority = 1
+	case "high":
+		priority = 0
+	default:
+		return "", -1, errors.New("priority must be low, normal or high")
+	}
+	return addTask.Description, task.TaskPriority(priority), nil
 }
