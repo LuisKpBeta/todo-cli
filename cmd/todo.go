@@ -2,6 +2,7 @@ package main
 
 import (
 	"todo/cmd/comands"
+	"todo/internal/task/database"
 
 	"database/sql"
 
@@ -11,16 +12,19 @@ import (
 )
 
 func createDatabase() *sql.DB {
-	db, err := sql.Open("sqlite3", "./tasksdb")
+	db, err := sql.Open("sqlite3", "./tasks.db")
 	if err != nil {
 		panic("error on connection with database")
 	}
+	repo:=database.NewTaskRepository(db)
+	repo.CreateTaskTableIfNoExists()
 	return db
 }
 
 
 func main() {
 	db := createDatabase()
+	
 	rootCmd := cobra.Command{
 		Use: "task",
 	}
