@@ -2,10 +2,7 @@ package usecases
 
 import task "todo/internal/task/model"
 
-type ListTaskArgs struct {
-	ListAll         bool
-	OrderByPriority bool
-}
+
 type ReadTaskDTO struct {
 	Id          int
 	Description string
@@ -24,8 +21,8 @@ func NewListTaskUseCase(taskRepository task.ListTaskRepositoryInterface) *ListTa
 	}
 }
 
-func (l *ListTaskUseCase) Execute(listTaskArgs ListTaskArgs) ([]ReadTaskDTO, error) {
-	tasks, err := l.TaskRepository.ListTasks(listTaskArgs.ListAll, listTaskArgs.OrderByPriority)
+func (l *ListTaskUseCase) Execute(listAll bool) ([]ReadTaskDTO, error) {
+	tasks, err := l.TaskRepository.ListTasks(listAll)
 	if err != nil {
 		return nil, err
 	}

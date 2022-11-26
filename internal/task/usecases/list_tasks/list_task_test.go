@@ -15,7 +15,6 @@ import (
 type ListTaskRepositoryStub struct {
 	CalledArgs struct {
 		listAll         bool
-		orderByPriority bool
 	}
 }
 
@@ -31,13 +30,11 @@ func makeTaskList() []task.Task {
 	taskList = append(taskList, validAddTask)
 	return taskList
 }
-func (t *ListTaskRepositoryStub) ListTasks(listAll bool, orderByPriority bool) ([]task.Task, error) {
+func (t *ListTaskRepositoryStub) ListTasks(listAll bool) ([]task.Task, error) {
 	t.CalledArgs = struct {
 		listAll         bool
-		orderByPriority bool
 	}{
 		listAll:         listAll,
-		orderByPriority: orderByPriority,
 	}
 	taskList := makeTaskList()
 	return taskList, nil
@@ -52,17 +49,17 @@ func TestListTaskUseCase_ReturnsErrorOnFail(t *testing.T) {
 	monkey.PatchInstanceMethod(
 		reflect.TypeOf(sut.TaskRepository),
 		"ListTasks",
-		func(t *ListTaskRepositoryStub, _ bool, _ bool) ([]task.Task, error) {
+		func(t *ListTaskRepositoryStub, _ bool) ([]task.Task, error) {
 			return nil, errors.New("error on load tasks")
 		})
-	_, err := sut.Execute(ListTaskArgs{})
+	_, err := sut.Execute(false)
 	fmt.Println(err)
 	assert.Error(t, err, "error on load task")
 	monkey.UnpatchInstanceMethod(reflect.TypeOf(sut.TaskRepository), "ListTasks")
 }
 func TestListTaskUseCase(t *testing.T) {
 	sut, _ := makeListTaskUseCase()
-	tasks, err := sut.Execute(ListTaskArgs{})
+	tasks, err := sut.Execute(false)
 	assert.Nil(t, err)
 	assert.Equal(t, len(tasks), 1)
 	assert.Equal(t, tasks[0].Id, 1)
@@ -71,10 +68,9 @@ func TestListTaskUseCase(t *testing.T) {
 func TestListTaskUseCaseCallsRepositoryWithCorrectArgs(t *testing.T) {
 
 	sut, repoSpy := makeListTaskUseCase()
-	_, err := sut.Execute(ListTaskArgs{ListAll: false, OrderByPriority: true})
+	_, err := sut.Execute(true)
 	assert.Nil(t, err)
-	assert.True(t, repoSpy.CalledArgs.orderByPriority)
-	assert.False(t, repoSpy.CalledArgs.listAll)
+	assert.True(t, repoSpy.CalledArgs.listAll)
 }
 
 func TestListTaskUseCaseReturnsListOfReadTaskDTO(t *testing.T) {
@@ -82,7 +78,7 @@ func TestListTaskUseCaseReturnsListOfReadTaskDTO(t *testing.T) {
 		return time.Date(2022, 11, 19, 13, 25, 0, 0, time.Local)
 	})
 	sut, _ := makeListTaskUseCase()
-	tasks, err := sut.Execute(ListTaskArgs{})
+	tasks, err := sut.Execute(true)
 	assert.Nil(t, err)
 	assert.Equal(t, len(tasks), 1)
 	assert.Equal(t, tasks[0].Id, 1)

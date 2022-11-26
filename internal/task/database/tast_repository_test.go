@@ -128,7 +128,7 @@ func (suite *TaskRepositoryTestSuite) TestListTaskRepository() {
 	suite.insertDummyTask(task1)
 	suite.insertDummyTask(completedTask)
 	repo := NewTaskRepository(suite.Db)
-	taskList, err := repo.ListTasks(true, false)
+	taskList, err := repo.ListTasks(true)
 	suite.Nil(err)
 
 	suite.Equal(len(taskList), 2)
@@ -142,45 +142,9 @@ func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryGetOnlyPendingTasks(
 	suite.insertDummyTask(task1)
 	suite.insertDummyTask(completedTask)
 	repo := NewTaskRepository(suite.Db)
-	taskList, err := repo.ListTasks(false, false)
+	taskList, err := repo.ListTasks(false)
 	suite.Nil(err)
 	for _, task:=range taskList {
 		suite.False(task.Status)
 	}
-}
-func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryOrderingByPriority() {
-	completed, _ := task.NewTask("task 0", task.Low)
-	lowTask, _ := task.NewTask("task 1", task.Low)
-	normalTask, _ := task.NewTask("task 2", task.Normal)
-	highTask, _ := task.NewTask("task 2", task.High)
-	completed.Status=true
-	suite.insertDummyTask(completed)
-	suite.insertDummyTask(lowTask)
-	suite.insertDummyTask(normalTask)
-	suite.insertDummyTask(highTask)
-	repo := NewTaskRepository(suite.Db)
-	taskList, err := repo.ListTasks(false, true)
-	suite.Nil(err)
-	suite.Equal(len(taskList), 3)
-	suite.Equal(taskList[0].Id, highTask.Id)
-	suite.Equal(taskList[1].Id, normalTask.Id)
-	suite.Equal(taskList[2].Id, lowTask.Id)
-}
-func (suite *TaskRepositoryTestSuite) TestListTaskRepositoryOrderingByPriorityGettingAllTasks() {
-	completed, _ := task.NewTask("task 0", task.Low)
-	lowTask, _ := task.NewTask("task 1", task.Low)
-	normalTask, _ := task.NewTask("task 2", task.Normal)
-	highTask, _ := task.NewTask("task 2", task.High)
-	suite.insertDummyTask(completed)
-	suite.insertDummyTask(lowTask)
-	suite.insertDummyTask(normalTask)
-	suite.insertDummyTask(highTask)
-	repo := NewTaskRepository(suite.Db)
-	taskList, err := repo.ListTasks(true, true)
-	suite.Nil(err)
-	suite.Equal(len(taskList), 4)
-	suite.Equal(taskList[0].Id, highTask.Id)
-	suite.Equal(taskList[1].Id, normalTask.Id)
-	suite.Equal(taskList[2].Id, completed.Id)
-	suite.Equal(taskList[3].Id, lowTask.Id)
 }

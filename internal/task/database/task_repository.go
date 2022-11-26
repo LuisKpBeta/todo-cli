@@ -76,13 +76,10 @@ func (t *TaskRepository) DeleteById(taskId int) error {
 	}
 	return err
 }
-func (t *TaskRepository) ListTasks(listAll bool, orderByPriority bool) ([]task.Task, error) {
+func (t *TaskRepository) ListTasks(listAll bool) ([]task.Task, error) {
 	query := "SELECT * FROM tasks"
 	if !listAll {
 		query = query + " WHERE status=0"
-	}
-	if orderByPriority {
-		query = query + " ORDER BY priority"
 	}
 	rows, err := t.Db.Query(query)
 
