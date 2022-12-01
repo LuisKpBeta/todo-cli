@@ -2,9 +2,8 @@ package comands
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"strconv"
+	common "todo/cmd/common"
 	repo "todo/internal/task/database"
 	usecases "todo/internal/task/usecases/complete_task"
 
@@ -23,15 +22,15 @@ func CompleteTaskComand(dbConn *sql.DB) *cobra.Command {
 }
 func buildCompleteTask(dbConn *sql.DB) *usecases.CompleteTaskUseCase {
 	repository := repo.NewTaskRepository(dbConn)
-	completeTasl := usecases.NewCompleteTaskUseCase(repository, repository)
-	return completeTasl
+	completeTask := usecases.NewCompleteTaskUseCase(repository, repository)
+	return completeTask
 }
 func runCompleteTask(dbConn *sql.DB) func(cmd *cobra.Command, args []string) {
 	completeTaskUseCase := buildCompleteTask(dbConn)
 	return func(cmd *cobra.Command, args []string) {
-		taskId, err := strconv.Atoi(args[0])
+		taskId, err := common.CheckAndParseIdArg(args[0])
 		if err != nil {
-			checkForError(err, args[0])
+			fmt.Println(err)
 			return
 		}
 		task, err := completeTaskUseCase.Execute(int(taskId))
@@ -42,12 +41,4 @@ func runCompleteTask(dbConn *sql.DB) func(cmd *cobra.Command, args []string) {
 		fmt.Println("task:", task.Id, "completed in ", task.Age())
 	}
 }
-func checkForError(err error, value string){
-	var msg string
-	if errors.Is(err, strconv.ErrSyntax) {
-		msg = fmt.Sprint("invalid value \"", value, "\" for a task id\n")
-	} else {
-		msg = err.Error()
-	}
-	fmt.Println(msg)
-}
+
