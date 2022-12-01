@@ -29,6 +29,7 @@ func main() {
 		Use: "task",
 	}
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
+	rootCmd.Version = "1.0.0"
 	rootCmd.AddCommand(comands.AddTaskComand(db))
 	rootCmd.AddCommand(comands.CompleteTaskComand(db))
 	rootCmd.AddCommand(comands.DeleteTaskComand(db))
