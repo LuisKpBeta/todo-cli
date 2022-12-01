@@ -20,7 +20,6 @@ func AddTaskComand(dbConn *sql.DB) *cobra.Command {
 	}
 	comand.DisableFlagsInUseLine = true
 	comand.Flags().StringP("priority", "p", "", "define task priority")
-	comand.MarkFlagRequired("priority")
 	return comand
 }
 func buildAddTask(dbConn *sql.DB) *usecases.AddTaskUseCase {

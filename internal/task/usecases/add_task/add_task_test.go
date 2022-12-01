@@ -31,11 +31,22 @@ func makeValidTask() dto.AddTaskDTO {
 func TestAddTaskCreateAndReturnNewTask(t *testing.T) {
 	sut := makeSut()
 	validAddTask := makeValidTask()
+	validAddTask.Priority = "high"
 	newTask, err := sut.Execute(validAddTask)
 	assert.Nil(t, err)
 	assert.Equal(t, newTask.Id, 1)
-	assert.Equal(t, newTask.Description, newTask.Description)
-	assert.Equal(t, newTask.Priority(), newTask.Priority())
+	assert.Equal(t, newTask.Description, validAddTask.Description)
+	assert.Equal(t, newTask.Priority(),  task.High)
+}
+func TestAddTaskCreateTaskAsNormalPriorityWhenEmpty(t *testing.T) {
+	sut := makeSut()
+	validAddTask := makeValidTask()
+	validAddTask.Priority = ""
+	newTask, err := sut.Execute(validAddTask)
+	assert.Nil(t, err)
+	assert.Equal(t, newTask.Id, 1)
+	assert.Equal(t, newTask.Description, validAddTask.Description)
+	assert.Equal(t, newTask.Priority(), task.Normal)
 }
 func TestReturnErrorOnRepositoryReturnsError(t *testing.T) {
 	sut := makeSut()

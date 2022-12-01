@@ -19,6 +19,9 @@ func NewAddTaskUseCase(taskRepository task.AddTaskRepositoryInterface) *AddTaskU
 
 func (a *AddTaskUseCase) Execute(newTaskDTO dto.AddTaskDTO) (*task.Task, error) {
 	var err error
+	if(newTaskDTO.Priority==""){
+		newTaskDTO.Priority = "normal"
+	}
 	description, priority, err :=dto.MapAddTaskDtoToTask(newTaskDTO)
 	if err != nil {
 		return nil, err
