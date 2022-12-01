@@ -2,10 +2,9 @@ package comands
 
 import (
 	"database/sql"
-	"fmt"
+	c "todo/cmd/common"
 	repo "todo/internal/task/database"
 	usecases "todo/internal/task/usecases/list_tasks"
-	"todo/internal/task/usecases/task_dto"
 
 	"github.com/spf13/cobra"
 )
@@ -32,17 +31,7 @@ func runListTask(dbConn *sql.DB) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, _ []string) {
 		getAll, _ := cmd.Flags().GetBool("all")
 		taskList, _ := listTasksUseCase.Execute(getAll)
-		prettyListPrinter(taskList)
+		c.PrettyListPrinter(taskList)
 	}
 }
-func prettyListPrinter(taskList []task_dto.ReadTaskDTO) {
-	for _, task := range taskList {
-		fmt.Printf("%d. %s %s (%s) %s\n", task.Id, statusIcon(task.Status), task.Description, task.Priority, task.Age)
-	}
-}
-func statusIcon(status bool) string {
-	if status {
-		return "✔"
-	}
-	return "□"
-}
+
