@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 	task "todo/internal/task/model"
@@ -35,6 +36,22 @@ func TestCompleteTaskUseCase(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, task.Id, 1)
 	assert.True(t, task.Status)
+}
+func TestCompleteTaskUseCase_WhenTaksAlreadyCompleted(t *testing.T) {
+	sut := makeCompleteTaskUseCase()
+	validAddTask := makeTask()
+	monkey.PatchInstanceMethod(
+		reflect.TypeOf(sut.FindTaskRepository),
+		"FindById",
+		func(t *CompleteTaskRepositoryStub, _ int) (*task.Task, error) {
+			task:=makeTask()
+			task.Status = true
+			return task, nil
+		})
+	task, err := sut.Execute(validAddTask.Id)
+	assert.Nil(t, task)
+	err_msg := fmt.Sprint("task with id \"",validAddTask.Id,"\" already completed")
+	assert.Error(t, err, err_msg)
 }
 func TestCompleteTaskUseCase_WhenFail(t *testing.T) {
 	sut := makeCompleteTaskUseCase()

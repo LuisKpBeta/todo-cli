@@ -27,6 +27,10 @@ func (a *CompleteTaskUseCase) Execute(taskId int) (*task.Task, error) {
 		err_msg := fmt.Sprint("tasks not found with id: ", taskId)
 		return nil, errors.New(err_msg)
 	}
+	if(task.Status){
+		err_msg := fmt.Sprint("tasks with id \"",taskId,"\" already completed")
+		return nil, errors.New(err_msg)
+	}
 	task.CompleteTask()
 	err = a.CompleteTaskRepository.CompleteTask(task)
 	if err != nil {
