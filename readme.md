@@ -3,8 +3,7 @@
 * [DevChallenge](#devchallenge) 
 * [Challenge](#challenge)
 * [Requirements](#requirements)
-* [Share](#share)
-* [Community](#devchallenge-community)
+* [Build](#build)
 
 
 # DevChallenge
@@ -51,3 +50,21 @@ task next # Shows the next task of each priority
 
     Instead of showing the creation date of each task, that property should be substituted by a new property that displays how long ago the task was created (1 month).
 8. **[local file or database]** : Should be able to persist data so it isn't lost after the CLI finishes execution.
+
+# Build
+
+To build the application for the linux environment, you can use the standard command
+``` 
+go build cmd/todo.go
+```
+To build for windows OS, you need to input some flags for correct output
+```
+GOOS=windows GOARCH=386 \
+CGO_ENABLED=1 CXX=i686-w64-mingw32-g++ \
+CC=i686-w64-mingw32-gcc \
+go build cmd/todo.go 
+```
+
+If you are using the project inside the devcontainer, the gcc dependencies are already installed
+
+To use builded app, you only need to add aplication to PATH env of your OS
