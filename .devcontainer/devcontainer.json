@@ -1,6 +1,8 @@
 {
 	"name": "Go",
-	"image": "mcr.microsoft.com/devcontainers/go:0-1-bullseye",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "lts"
